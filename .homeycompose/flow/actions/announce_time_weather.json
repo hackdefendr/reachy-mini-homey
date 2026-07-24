@@ -1,0 +1,13 @@
+{
+  "id": "announce_time_weather",
+  "title": { "en": "Announce the time and weather" },
+  "titleFormatted": { "en": "Announce the time and weather" },
+  "hint": { "en": "Reachy speaks the current time and current weather, cuckoo-clock style." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ]
+}

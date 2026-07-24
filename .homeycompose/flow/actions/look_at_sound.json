@@ -1,0 +1,9 @@
+{
+  "id": "look_at_sound",
+  "title": { "en": "Look toward the last sound" },
+  "titleFormatted": { "en": "Look toward the last sound" },
+  "hint": { "en": "Reachy turns its head toward the direction of the most recent detected speech (requires \"Listen for sounds\")." },
+  "args": [
+    { "type": "device", "name": "device", "filter": "driver_id=reachy-mini" }
+  ]
+}

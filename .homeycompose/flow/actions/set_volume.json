@@ -1,0 +1,24 @@
+{
+  "id": "set_volume",
+  "title": { "en": "Set the volume" },
+  "titleFormatted": { "en": "Set volume to [[volume]]%" },
+  "hint": { "en": "Set Reachy's speaker volume (0-100%)." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    },
+    {
+      "type": "range",
+      "name": "volume",
+      "title": { "en": "Volume" },
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "value": 60,
+      "label": "%",
+      "labelDecimals": 0
+    }
+  ]
+}

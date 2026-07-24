@@ -1,0 +1,27 @@
+{
+  "id": "face_detected",
+  "title": { "en": "A face appeared" },
+  "titleFormatted": { "en": "A face appeared" },
+  "hint": { "en": "Fires when Reachy turns its head to track a face (requires \"Watch for face-tracking motion\" enabled, plus a face-tracking app running on the robot). Tokens carry the head yaw/pitch it turned to." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "x",
+      "type": "number",
+      "title": { "en": "Face X" },
+      "example": 0.12
+    },
+    {
+      "name": "y",
+      "type": "number",
+      "title": { "en": "Face Y" },
+      "example": -0.05
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "name": { "en": "Reachy Mini" },
+  "class": "speaker",
+  "capabilities": ["onoff", "volume_set"],
+  "capabilitiesOptions": {
+    "onoff": {
+      "title": { "en": "Awake" },
+      "insightsTitleTrue": { "en": "Woke up" },
+      "insightsTitleFalse": { "en": "Went to sleep" }
+    },
+    "volume_set": {
+      "title": { "en": "Volume" }
+    }
+  },
+  "platforms": ["local"],
+  "connectivity": ["lan"],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "enter_address",
+      "navigation": { "next": "add_devices" }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ],
+  "settings": [
+    {
+      "type": "group",
+      "label": { "en": "Connection" },
+      "children": [
+        {
+          "id": "address",
+          "type": "text",
+          "label": { "en": "Address (host:port)" },
+          "value": "",
+          "hint": { "en": "Your Reachy Mini's address, e.g. 192.168.1.42:8000. Set during pairing; change it here if the robot's IP changes." }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": { "en": "Announcements" },
+      "children": [
+        {
+          "id": "units",
+          "type": "dropdown",
+          "label": { "en": "Temperature units" },
+          "value": "fahrenheit",
+          "values": [
+            { "id": "fahrenheit", "label": { "en": "Fahrenheit (°F)" } },
+            { "id": "celsius", "label": { "en": "Celsius (°C)" } }
+          ]
+        },
+        {
+          "id": "clock",
+          "type": "dropdown",
+          "label": { "en": "Clock format" },
+          "value": "12",
+          "values": [
+            { "id": "12", "label": { "en": "12-hour" } },
+            { "id": "24", "label": { "en": "24-hour" } }
+          ]
+        },
+        {
+          "id": "tts_lang",
+          "type": "dropdown",
+          "label": { "en": "Voice language" },
+          "value": "en",
+          "hint": { "en": "Language for the Google voice. OpenAI and ElevenLabs detect the language from the text automatically." },
+          "values": [
+            { "id": "en", "label": { "en": "English" } },
+            { "id": "es", "label": { "en": "Spanish" } },
+            { "id": "fr", "label": { "en": "French" } },
+            { "id": "de", "label": { "en": "German" } },
+            { "id": "it", "label": { "en": "Italian" } },
+            { "id": "pt", "label": { "en": "Portuguese" } },
+            { "id": "nl", "label": { "en": "Dutch" } },
+            { "id": "pl", "label": { "en": "Polish" } },
+            { "id": "ru", "label": { "en": "Russian" } },
+            { "id": "sv", "label": { "en": "Swedish" } },
+            { "id": "tr", "label": { "en": "Turkish" } },
+            { "id": "ja", "label": { "en": "Japanese" } },
+            { "id": "ko", "label": { "en": "Korean" } },
+            { "id": "zh-CN", "label": { "en": "Chinese" } }
+          ]
+        },
+        {
+          "id": "speak_gesture",
+          "type": "checkbox",
+          "label": { "en": "Wiggle antennas while speaking" },
+          "value": true
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": { "en": "Voice" },
+      "children": [
+        {
+          "id": "tts_provider",
+          "type": "dropdown",
+          "label": { "en": "Voice provider" },
+          "value": "openai",
+          "hint": { "en": "OpenAI and ElevenLabs need an API key below. Without a valid key, Reachy automatically falls back to the free Google voice." },
+          "values": [
+            { "id": "openai", "label": { "en": "OpenAI (recommended, needs API key)" } },
+            { "id": "elevenlabs", "label": { "en": "ElevenLabs (needs API key)" } },
+            { "id": "google", "label": { "en": "Google Translate (free, robotic)" } }
+          ]
+        },
+        {
+          "id": "tts_api_key",
+          "type": "password",
+          "label": { "en": "API key" },
+          "value": "",
+          "hint": { "en": "Your OpenAI or ElevenLabs API key. Not used by Google." }
+        },
+        {
+          "id": "tts_model",
+          "type": "dropdown",
+          "label": { "en": "OpenAI model" },
+          "value": "tts-1-hd",
+          "hint": { "en": "Only used when the provider is OpenAI." },
+          "values": [
+            { "id": "tts-1-hd", "label": { "en": "HD — highest quality" } },
+            { "id": "tts-1", "label": { "en": "Standard — faster/cheaper" } },
+            { "id": "gpt-4o-mini-tts", "label": { "en": "GPT-4o mini TTS — newest" } }
+          ]
+        },
+        {
+          "id": "tts_voice",
+          "type": "dropdown",
+          "label": { "en": "OpenAI voice" },
+          "value": "onyx",
+          "hint": { "en": "Only used when the provider is OpenAI." },
+          "values": [
+            { "id": "alloy", "label": { "en": "Alloy — neutral" } },
+            { "id": "echo", "label": { "en": "Echo — warm male" } },
+            { "id": "fable", "label": { "en": "Fable — expressive" } },
+            { "id": "onyx", "label": { "en": "Onyx — deep male" } },
+            { "id": "nova", "label": { "en": "Nova — bright female" } },
+            { "id": "shimmer", "label": { "en": "Shimmer — soft female" } }
+          ]
+        },
+        {
+          "id": "tts_elevenlabs_voice",
+          "type": "text",
+          "label": { "en": "ElevenLabs voice ID" },
+          "value": "",
+          "hint": { "en": "Optional ElevenLabs voice ID. Leave blank for the ElevenLabs default voice. Only used when the provider is ElevenLabs." }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": { "en": "Vision (Eyes)" },
+      "children": [
+        {
+          "id": "face_detection",
+          "type": "checkbox",
+          "label": { "en": "Watch for face-tracking motion" },
+          "value": false,
+          "hint": { "en": "Enables the \"A face appeared\" trigger by watching the robot's head turn toward a face. Requires a face-tracking app running on the robot (the daemon exposes no direct face signal)." }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": { "en": "Hearing (Ears)" },
+      "children": [
+        {
+          "id": "listen_doa",
+          "type": "checkbox",
+          "label": { "en": "Listen for sounds" },
+          "value": false,
+          "hint": { "en": "Enables the \"Heard someone speak\" trigger using the mic array (direction of arrival). Acquires the robot's mic, so it cannot run at the same time as a camera app (the face-tracker eyes)." }
+        }
+      ]
+    }
+  ]
+}

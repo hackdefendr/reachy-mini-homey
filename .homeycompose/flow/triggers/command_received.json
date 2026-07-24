@@ -1,0 +1,22 @@
+{
+  "id": "command_received",
+  "title": { "en": "Reachy received a voice command" },
+  "titleFormatted": { "en": "Reachy received a command containing [[match]]" },
+  "hint": { "en": "Fires when Reachy's conversation tool sends a command to Homey that contains the given text. Use the Command token in your actions." },
+  "args": [
+    {
+      "type": "text",
+      "name": "match",
+      "title": { "en": "Command contains" },
+      "placeholder": { "en": "lights off" }
+    }
+  ],
+  "tokens": [
+    {
+      "name": "command",
+      "type": "string",
+      "title": { "en": "Command" },
+      "example": "turn off the living room lights"
+    }
+  ]
+}

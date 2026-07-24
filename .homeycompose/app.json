@@ -1,0 +1,47 @@
+{
+  "id": "co.hf.reachy",
+  "version": "1.2.0",
+  "compatibility": ">=12.4.0",
+  "sdk": 3,
+  "runtime": "nodejs",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Reachy Mini Controller"
+  },
+  "description": {
+    "en": "Use the Huggingface Reachy Mini Robot as the Eyes, Ears, and Voice for Homey."
+  },
+  "category": [
+    "appliances"
+  ],
+  "permissions": [
+    "homey:manager:geolocation",
+    "homey:manager:api"
+  ],
+  "brandColor": "#148F96",
+  "api": {
+    "command": {
+      "method": "POST",
+      "path": "/command"
+    },
+    "info": {
+      "method": "GET",
+      "path": "/info"
+    },
+    "setup": {
+      "method": "GET",
+      "path": "/setup"
+    }
+  },
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Jeff Singleton",
+    "email": "gvibe06@gmail.com"
+  }
+}

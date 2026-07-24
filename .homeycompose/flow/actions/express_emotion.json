@@ -1,0 +1,22 @@
+{
+  "id": "express_emotion",
+  "title": { "en": "Express an emotion" },
+  "titleFormatted": { "en": "Express [[emotion]]" },
+  "hint": { "en": "Reachy performs a short expressive motion with its head and antennas." },
+  "args": [
+    { "type": "device", "name": "device", "filter": "driver_id=reachy-mini" },
+    {
+      "type": "dropdown",
+      "name": "emotion",
+      "title": { "en": "Emotion" },
+      "value": "happy",
+      "values": [
+        { "id": "happy", "label": { "en": "Happy" } },
+        { "id": "sad", "label": { "en": "Sad" } },
+        { "id": "curious", "label": { "en": "Curious" } },
+        { "id": "excited", "label": { "en": "Excited" } },
+        { "id": "confused", "label": { "en": "Confused" } }
+      ]
+    }
+  ]
+}

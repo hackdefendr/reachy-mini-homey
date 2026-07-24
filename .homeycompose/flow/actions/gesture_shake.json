@@ -1,0 +1,9 @@
+{
+  "id": "gesture_shake",
+  "title": { "en": "Shake head (no)" },
+  "titleFormatted": { "en": "Shake head (no)" },
+  "hint": { "en": "Reachy shakes its head left and right. Works best when no camera app is controlling the head." },
+  "args": [
+    { "type": "device", "name": "device", "filter": "driver_id=reachy-mini" }
+  ]
+}

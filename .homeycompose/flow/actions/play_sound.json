@@ -1,0 +1,19 @@
+{
+  "id": "play_sound",
+  "title": { "en": "Play a sound file" },
+  "titleFormatted": { "en": "Play sound [[file]]" },
+  "hint": { "en": "Play a sound already uploaded to Reachy, or a built-in asset name." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    },
+    {
+      "type": "text",
+      "name": "file",
+      "title": { "en": "File name" },
+      "placeholder": { "en": "chime.mp3" }
+    }
+  ]
+}

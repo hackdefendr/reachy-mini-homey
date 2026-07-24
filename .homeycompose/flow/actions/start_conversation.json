@@ -1,0 +1,13 @@
+{
+  "id": "start_conversation",
+  "title": { "en": "Start conversation mode" },
+  "titleFormatted": { "en": "Start conversation mode" },
+  "hint": { "en": "Switch Reachy into two-way voice conversation (talk and it replies). This stops the face-tracker/eyes. Pick a personality in the conversation app's web UI on port 7860." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ]
+}

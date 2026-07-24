@@ -1,0 +1,52 @@
+<style>
+  .reachy-pair { padding: 0 20px; text-align: center; }
+  .reachy-pair .hint { color: var(--homey-color-mono-500, #888); font-size: 14px; margin: 4px 0 20px; }
+  .reachy-pair input { text-align: center; }
+  .reachy-pair #status { margin-top: 16px; min-height: 20px; font-size: 14px; }
+  .reachy-pair #status.error { color: var(--homey-color-red-500, #e54d42); }
+  .reachy-pair #status.ok { color: var(--homey-color-green-500, #16a34a); }
+</style>
+
+<div class="reachy-pair">
+  <h1 class="homey-title">Connect your Reachy Mini</h1>
+  <p class="hint">Enter the address shown on your Reachy Mini dashboard, for example <b>192.168.1.42:8000</b>.</p>
+  <input id="address" class="homey-form-input" type="text" placeholder="192.168.1.42:8000" autocomplete="off" spellcheck="false">
+  <button id="connect" class="homey-button-primary-full" style="margin-top:16px;">Connect</button>
+  <div id="status"></div>
+</div>
+
+<script type="text/javascript">
+  function onHomeyReady(Homey) {
+    Homey.setTitle('Connect your Reachy Mini');
+
+    const input = document.getElementById('address');
+    const button = document.getElementById('connect');
+    const status = document.getElementById('status');
+
+    function setStatus(msg, kind) {
+      status.textContent = msg || '';
+      status.className = kind || '';
+    }
+
+    async function connect() {
+      const address = input.value.trim();
+      if (!address) { setStatus('Please enter your Reachy Mini address.', 'error'); return; }
+      button.disabled = true;
+      setStatus('Connecting…');
+      try {
+        const result = await Homey.emit('test_address', address);
+        setStatus('Found ' + result.name + '!', 'ok');
+        setTimeout(() => Homey.nextView(), 400);
+      } catch (err) {
+        setStatus('Could not reach a Reachy Mini there: ' + (err && err.message ? err.message : err), 'error');
+        button.disabled = false;
+      }
+    }
+
+    button.addEventListener('click', connect);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
+    input.focus();
+
+    Homey.ready();
+  }
+</script>

@@ -1,0 +1,13 @@
+{
+  "id": "wake_up",
+  "title": { "en": "Wake up" },
+  "titleFormatted": { "en": "Wake up" },
+  "hint": { "en": "Play Reachy's wake-up motion." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ]
+}

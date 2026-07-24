@@ -1,0 +1,22 @@
+{
+  "id": "gesture_look",
+  "title": { "en": "Look in a direction" },
+  "titleFormatted": { "en": "Look [[direction]]" },
+  "hint": { "en": "Reachy turns its head to look in a direction." },
+  "args": [
+    { "type": "device", "name": "device", "filter": "driver_id=reachy-mini" },
+    {
+      "type": "dropdown",
+      "name": "direction",
+      "title": { "en": "Direction" },
+      "value": "center",
+      "values": [
+        { "id": "left", "label": { "en": "Left" } },
+        { "id": "right", "label": { "en": "Right" } },
+        { "id": "up", "label": { "en": "Up" } },
+        { "id": "down", "label": { "en": "Down" } },
+        { "id": "center", "label": { "en": "Center" } }
+      ]
+    }
+  ]
+}

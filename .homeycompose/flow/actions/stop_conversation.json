@@ -1,0 +1,13 @@
+{
+  "id": "stop_conversation",
+  "title": { "en": "Stop conversation mode" },
+  "titleFormatted": { "en": "Stop conversation mode" },
+  "hint": { "en": "Stop the conversation app and resume Reachy's startup app (the face-tracker/eyes)." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ]
+}

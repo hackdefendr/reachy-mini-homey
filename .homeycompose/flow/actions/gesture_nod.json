@@ -1,0 +1,9 @@
+{
+  "id": "gesture_nod",
+  "title": { "en": "Nod (yes)" },
+  "titleFormatted": { "en": "Nod (yes)" },
+  "hint": { "en": "Reachy nods its head up and down. Works best when no camera app is controlling the head." },
+  "args": [
+    { "type": "device", "name": "device", "filter": "driver_id=reachy-mini" }
+  ]
+}

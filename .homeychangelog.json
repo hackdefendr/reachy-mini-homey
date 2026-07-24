@@ -1,0 +1,11 @@
+{
+  "1.0.0": {
+    "en": "First release! Turn a Reachy Mini robot into Eyes, Ears, and a Voice for Homey: speak text, announce the time and weather, choose a TTS voice (Google, OpenAI, or ElevenLabs), face-detected and heard-speech triggers, two-way conversation mode, expressive gestures and emotions, and voice control of your home (lights, TVs, speakers, and more)."
+  },
+  "1.1.0": {
+    "en": "Voice upgrade: OpenAI text-to-speech now defaults to the HD model with voice and model pickers, and automatically falls back to the free Google voice if no API key is set. Settings with fixed choices are now dropdowns. In conversation mode, Reachy can now tell you the real current time and weather."
+  },
+  "1.2.0": {
+    "en": "Easier for everyone to install: you now enter your own Reachy Mini's address when pairing, a new in-app Voice Control setup page generates the exact robot configuration for you, and Reachy automatically recovers if it ever slumps into standby after a reboot."
+  }
+}

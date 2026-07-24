@@ -1,0 +1,13 @@
+{
+  "id": "go_to_sleep",
+  "title": { "en": "Go to sleep" },
+  "titleFormatted": { "en": "Go to sleep" },
+  "hint": { "en": "Play Reachy's go-to-sleep motion." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ]
+}

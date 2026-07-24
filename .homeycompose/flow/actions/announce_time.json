@@ -1,0 +1,24 @@
+{
+  "id": "announce_time",
+  "title": { "en": "Announce the time" },
+  "titleFormatted": { "en": "Announce the time in [[format]] format" },
+  "hint": { "en": "Reachy speaks the current time. The clock format is configurable per card." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    },
+    {
+      "type": "dropdown",
+      "name": "format",
+      "title": { "en": "Time format" },
+      "value": "device",
+      "values": [
+        { "id": "device", "label": { "en": "Device default" } },
+        { "id": "12", "label": { "en": "12-hour (3:15 PM)" } },
+        { "id": "24", "label": { "en": "24-hour (15:15)" } }
+      ]
+    }
+  ]
+}

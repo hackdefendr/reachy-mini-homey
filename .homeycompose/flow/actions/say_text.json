@@ -1,0 +1,19 @@
+{
+  "id": "say_text",
+  "title": { "en": "Say a message" },
+  "titleFormatted": { "en": "Say [[text]]" },
+  "hint": { "en": "Speak the given text through Reachy's speaker." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    },
+    {
+      "type": "text",
+      "name": "text",
+      "title": { "en": "Message" },
+      "placeholder": { "en": "Hello from Homey" }
+    }
+  ]
+}

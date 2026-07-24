@@ -1,0 +1,27 @@
+{
+  "id": "heard_speech",
+  "title": { "en": "Heard someone speak" },
+  "titleFormatted": { "en": "Heard someone speak" },
+  "hint": { "en": "Fires when Reachy's mic array detects speech, with the direction it came from. Requires \"Listen for sounds\" enabled and no camera app (eyes) running." },
+  "args": [
+    {
+      "type": "device",
+      "name": "device",
+      "filter": "driver_id=reachy-mini"
+    }
+  ],
+  "tokens": [
+    {
+      "name": "direction",
+      "type": "number",
+      "title": { "en": "Direction (°)" },
+      "example": 138
+    },
+    {
+      "name": "direction_label",
+      "type": "string",
+      "title": { "en": "Direction" },
+      "example": "front"
+    }
+  ]
+}

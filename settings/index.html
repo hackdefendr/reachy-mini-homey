@@ -1,151 +1,12 @@
-<script type="text/plain" id="tool_control">"""Custom Reachy conversation tool: control a Homey smart home by voice.
-
-Placed in the conversation app's external_tools/ directory. When the user asks
-Reachy to control the house, the LLM calls this tool, which relays the spoken
-command to the Homey app's API endpoint.
-
-Configuration (environment variables read by the running app):
-  HOMEY_COMMAND_URL - the Homey app command endpoint
-  HOMEY_API_TOKEN   - a Homey API key (Personal Access Token)
-"""
-
-import asyncio
-import json
-import logging
-import os
-import ssl
-import urllib.request
-from typing import Any, Dict
-
-from reachy_mini_conversation_app.tools.core_tools import Tool, ToolDependencies
-
-logger = logging.getLogger(__name__)
-
-
-class ControlHomeTool(Tool):
-    """Relay a spoken home-control request to Homey."""
-
-    name = "control_home"
-    description = (
-        "Control the user's Homey smart home: turn devices or lights on or off, "
-        "set brightness, activate scenes, or run home automations. Call this "
-        "whenever the user asks to control something in their home, passing their "
-        "request as the command."
-    )
-    parameters_schema = {
-        "type": "object",
-        "properties": {
-            "command": {
-                "type": "string",
-                "description": "The home-control request in plain language, "
-                "e.g. 'turn off the living room lights' or 'activate movie scene'.",
-            },
-        },
-        "required": ["command"],
-    }
-
-    async def __call__(self, deps: ToolDependencies, **kwargs: Any) -> Dict[str, Any]:
-        command = str(kwargs.get("command", "")).strip()
-        url = os.environ.get("HOMEY_COMMAND_URL", "").strip()
-        token = os.environ.get("HOMEY_API_TOKEN", "").strip()
-
-        if not command:
-            return {"status": "error", "message": "No command was provided."}
-        if not url or not token:
-            return {"status": "error", "message": "The Homey bridge is not configured."}
-
-        def _post() -> str:
-            data = json.dumps({"command": command}).encode("utf-8")
-            req = urllib.request.Request(
-                url,
-                data=data,
-                method="POST",
-                headers={
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {token}",
-                },
-            )
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-            with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
-                return resp.read().decode("utf-8")
-
-        try:
-            body = await asyncio.to_thread(_post)
-            logger.info("control_home sent '%s' -> %s", command, body)
-            try:
-                message = json.loads(body).get("message") or f"Done: {command}"
-            except Exception:  # noqa: BLE001
-                message = f"Done: {command}"
-            return {"status": "success", "message": message}
-        except Exception as exc:  # noqa: BLE001
-            logger.error("control_home failed: %s", exc)
-            return {"status": "error", "message": f"Could not reach Homey: {exc}"}
-</script>
-
-<script type="text/plain" id="tool_info">"""Custom Reachy conversation tool: get the current time and weather from Homey."""
-
-import asyncio
-import json
-import logging
-import os
-import ssl
-import urllib.request
-from typing import Any, Dict
-
-from reachy_mini_conversation_app.tools.core_tools import Tool, ToolDependencies
-
-logger = logging.getLogger(__name__)
-
-
-class GetTimeWeatherTool(Tool):
-    """Fetch the current local time and weather from Homey."""
-
-    name = "get_time_and_weather"
-    description = (
-        "Get the user's current local time and current weather from their Homey "
-        "smart home. Call this whenever the user asks what time it is, what the "
-        "weather is like, or asks you to announce the time and/or weather. It "
-        "returns a ready-to-say sentence with the real local time and conditions."
-    )
-    parameters_schema = {"type": "object", "properties": {}, "required": []}
-
-    async def __call__(self, deps: ToolDependencies, **kwargs: Any) -> Dict[str, Any]:
-        url = os.environ.get("HOMEY_INFO_URL", "").strip()
-        token = os.environ.get("HOMEY_API_TOKEN", "").strip()
-        if not url or not token:
-            return {"status": "error", "message": "The Homey bridge is not configured."}
-
-        def _get() -> str:
-            req = urllib.request.Request(
-                url, method="GET", headers={"Authorization": f"Bearer {token}"},
-            )
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-            with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
-                return resp.read().decode("utf-8")
-
-        try:
-            body = await asyncio.to_thread(_get)
-            data = json.loads(body)
-            logger.info("get_time_and_weather -> %s", data.get("message"))
-            return {"status": "success", "message": data.get("message") or "I couldn't get the time and weather."}
-        except Exception as exc:  # noqa: BLE001
-            logger.error("get_time_and_weather failed: %s", exc)
-            return {"status": "error", "message": f"Could not reach Homey: {exc}"}
-</script>
-
 <style>
   .rc { max-width: 720px; }
   .rc h2 { margin-top: 24px; }
   .rc p, .rc li { line-height: 1.5; }
-  .rc code { background: var(--homey-color-mono-100, #f0f0f0); padding: 1px 5px; border-radius: 4px; }
+  .rc code { background: var(--homey-color-mono-100, #f0f0f0); padding: 1px 5px; border-radius: 4px; word-break: break-all; }
   .rc .field { margin: 12px 0; }
   .rc label { display: block; font-weight: 600; margin-bottom: 4px; }
   .rc input[type=text] { width: 100%; }
-  .rc textarea { width: 100%; min-height: 220px; font-family: monospace; font-size: 12px; white-space: pre; }
+  .rc textarea { width: 100%; min-height: 200px; font-family: monospace; font-size: 12px; white-space: pre; }
   .rc .muted { color: var(--homey-color-mono-500, #888); font-size: 13px; }
   .rc .row { display: flex; gap: 8px; align-items: center; }
   .rc #copied { color: var(--homey-color-green-500, #16a34a); font-size: 13px; }
@@ -156,7 +17,7 @@ class GetTimeWeatherTool(Tool):
   <h1 class="homey-title">Reachy Voice Control &amp; Weather — Setup</h1>
   <p>Everything else in this app works without setup — just pair your robot. This page is <b>only</b>
      for the advanced feature that lets you <b>talk to Reachy to control your home and ask the weather</b>.
-     It needs a small tool installed on the robot itself (a Linux device you connect to over SSH).</p>
+     It installs two small tools on the robot itself (a Linux device you reach over SSH).</p>
 
   <h2>Step 1 — Create a Homey API key</h2>
   <p>Open <a href="https://my.homey.app" target="_blank">my.homey.app</a> → <b>Settings → API Keys → Create</b>
@@ -183,8 +44,10 @@ class GetTimeWeatherTool(Tool):
       <span id="copied"></span>
     </div>
     <textarea id="script" readonly></textarea>
-    <p class="muted">This installs two tools and writes the robot's <code>.env</code>. Requires the Reachy
-       <b>conversation app</b> to already be installed on the robot.</p>
+    <p class="muted">This downloads the two tools from
+       <a href="https://github.com/hackdefendr/reachy-mini-homey/tree/main/robot-tools" target="_blank">GitHub</a>
+       and writes the robot's <code>.env</code>. Requires the Reachy <b>conversation app</b> to already be
+       installed on the robot, and the robot to have internet access.</p>
   </div>
 </div>
 
@@ -192,6 +55,7 @@ class GetTimeWeatherTool(Tool):
   function onHomeyReady(Homey) {
     Homey.ready();
 
+    var RAW = 'https://raw.githubusercontent.com/hackdefendr/reachy-mini-homey/main/robot-tools';
     var cmdUrl = '';
     var infoUrl = '';
 
@@ -207,8 +71,6 @@ class GetTimeWeatherTool(Tool):
     });
 
     function buildScript(key) {
-      var control = document.getElementById('tool_control').textContent.replace(/^\n/, '');
-      var info = document.getElementById('tool_info').textContent.replace(/^\n/, '');
       return [
         '#!/usr/bin/env bash',
         '# Reachy Mini — Homey voice-control setup. Run on your Reachy over SSH.',
@@ -217,12 +79,9 @@ class GetTimeWeatherTool(Tool):
         'if [ -z "$TOOLS" ]; then echo "Conversation app not found — install it on your Reachy first."; exit 1; fi',
         'CWD="$(find /venvs -type d -path \'*reachy_mini/daemon/app/services/wireless\' 2>/dev/null | head -1)"',
         '[ -z "$CWD" ] && CWD="$HOME"',
-        "cat > \"$TOOLS/homey_control.py\" <<'HOMEY_TOOL_EOF'",
-        control,
-        'HOMEY_TOOL_EOF',
-        "cat > \"$TOOLS/homey_info.py\" <<'HOMEY_TOOL_EOF'",
-        info,
-        'HOMEY_TOOL_EOF',
+        'echo "Downloading Homey tools…"',
+        'curl -fsSL "' + RAW + '/homey_control.py" -o "$TOOLS/homey_control.py"',
+        'curl -fsSL "' + RAW + '/homey_info.py" -o "$TOOLS/homey_info.py"',
         'cat > "$CWD/.env" <<HOMEY_ENV_EOF',
         'AUTOLOAD_EXTERNAL_TOOLS=1',
         'REACHY_MINI_EXTERNAL_TOOLS_DIRECTORY=$TOOLS',

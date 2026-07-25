@@ -16,37 +16,37 @@
 </div>
 
 <script type="text/javascript">
-  function onHomeyReady(Homey) {
-    Homey.setTitle('Connect your Reachy Mini');
+  // In a custom PAIR view the global `Homey` object is available directly —
+  // there is NO onHomeyReady() wrapper (that is only for settings/widgets).
+  Homey.setTitle('Connect your Reachy Mini');
 
-    const input = document.getElementById('address');
-    const button = document.getElementById('connect');
-    const status = document.getElementById('status');
+  var input = document.getElementById('address');
+  var button = document.getElementById('connect');
+  var statusEl = document.getElementById('status');
 
-    function setStatus(msg, kind) {
-      status.textContent = msg || '';
-      status.className = kind || '';
-    }
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg || '';
+    statusEl.className = kind || '';
+  }
 
-    async function connect() {
-      const address = input.value.trim();
-      if (!address) { setStatus('Please enter your Reachy Mini address.', 'error'); return; }
-      button.disabled = true;
-      setStatus('Connecting…');
-      try {
-        const result = await Homey.emit('test_address', address);
-        setStatus('Found ' + result.name + '!', 'ok');
-        setTimeout(() => Homey.nextView(), 400);
-      } catch (err) {
+  function connect() {
+    var address = (input.value || '').trim();
+    if (!address) { setStatus('Please enter your Reachy Mini address.', 'error'); return; }
+    button.disabled = true;
+    setStatus('Connecting…');
+    Homey.emit('test_address', address)
+      .then(function (device) {
+        setStatus('Found ' + device.name + '!', 'ok');
+        return Homey.createDevice(device);
+      })
+      .then(function () { Homey.done(); })
+      .catch(function (err) {
         setStatus('Could not reach a Reachy Mini there: ' + (err && err.message ? err.message : err), 'error');
         button.disabled = false;
-      }
-    }
-
-    button.addEventListener('click', connect);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') connect(); });
-    input.focus();
-
-    Homey.ready();
+      });
   }
+
+  button.addEventListener('click', connect);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') connect(); });
+  input.focus();
 </script>

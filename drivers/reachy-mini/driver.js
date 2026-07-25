@@ -43,22 +43,18 @@ module.exports = class ReachyDriver extends Homey.Driver {
    * has a different IP), and we verify it responds before adding the device.
    */
   onPair(session) {
-    let discovered = null;
-
     session.setHandler('test_address', async (address) => {
       const addr = String(address || '').trim();
       const client = new ReachyClient(addr, { timeout: 6000 });
       const status = await client.getDaemonStatus(); // throws if unreachable
       const name = status.robot_name ? `Reachy Mini (${status.robot_name})` : 'Reachy Mini';
-      discovered = {
+      this.log('Pairing: found', name, 'at', addr);
+      // Returned to the pair view, which passes it straight to Homey.createDevice().
+      return {
         name,
         data: { id: status.hardware_id || ReachyClient.normalizeBaseUrl(addr) },
         settings: { address: addr },
       };
-      this.log('Pairing: found', name, 'at', addr);
-      return { name };
     });
-
-    session.setHandler('list_devices', async () => (discovered ? [discovered] : []));
   }
 };

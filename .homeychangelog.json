@@ -7,5 +7,8 @@
   },
   "1.2.0": {
     "en": "Easier for everyone to install: you now enter your own Reachy Mini's address when pairing, a new in-app Voice Control setup page generates the exact robot configuration for you, and Reachy automatically recovers if it ever slumps into standby after a reboot."
+  },
+  "1.2.1": {
+    "en": "accept"
   }
 }

@@ -1,22 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-  <defs>
-    <radialGradient id="bg" cx="50%" cy="40%" r="80%">
-      <stop offset="0%" stop-color="#1BA7AF"/>
-      <stop offset="60%" stop-color="#148F96"/>
-      <stop offset="100%" stop-color="#0E6B70"/>
-    </radialGradient>
-  </defs>
-  <rect width="200" height="200" rx="44" fill="url(#bg)"/>
-  <svg x="24" y="18" width="152" height="164" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
-    <line x1="76" y1="62" x2="56" y2="26" stroke="#FFCB47" stroke-width="7" stroke-linecap="round"/>
-    <line x1="124" y1="62" x2="144" y2="26" stroke="#FFCB47" stroke-width="7" stroke-linecap="round"/>
-    <circle cx="56" cy="24" r="10" fill="#FFCB47"/>
-    <circle cx="144" cy="24" r="10" fill="#FFCB47"/>
-    <path d="M74 150 h52 l12 30 a8 8 0 0 1 -8 10 h-60 a8 8 0 0 1 -8 -10 z" fill="#D7F0F0"/>
-    <rect x="44" y="58" width="112" height="94" rx="32" fill="#FFFFFF"/>
-    <circle cx="78" cy="106" r="16" fill="#0E3A3D"/>
-    <circle cx="122" cy="106" r="16" fill="#0E3A3D"/>
-    <circle cx="84" cy="100" r="5" fill="#FFFFFF"/>
-    <circle cx="128" cy="100" r="5" fill="#FFFFFF"/>
-  </svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <g fill="none" stroke="#2b2b2b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- antennas with coiled bases -->
+    <path d="M40 30 C39 26 41 24 40 21"/>
+    <line x1="40" y1="21" x2="33" y2="7"/>
+    <path d="M60 30 C61 26 59 24 60 21"/>
+    <line x1="60" y1="21" x2="67" y2="7"/>
+    <circle cx="32.5" cy="6" r="2" fill="#2b2b2b" stroke="none"/>
+    <circle cx="67.5" cy="6" r="2" fill="#2b2b2b" stroke="none"/>
+    <!-- head (squircle) -->
+    <rect x="30" y="27" width="40" height="26" rx="12"/>
+    <!-- glasses-style camera eyes with bridge -->
+    <circle cx="42" cy="40" r="6.5"/>
+    <circle cx="58" cy="40" r="6.5"/>
+    <line x1="48.5" y1="40" x2="51.5" y2="40"/>
+    <!-- egg-shaped body -->
+    <path d="M39 55 C33 62 32 74 35 82 C38 89 62 89 65 82 C68 74 67 62 61 55 Z"/>
+    <!-- dark rotating base -->
+    <path d="M37 84 C42 88 58 88 63 84" stroke-width="3.4"/>
+  </g>
 </svg>

@@ -10,5 +10,8 @@
   },
   "1.2.1": {
     "en": "Fixes the pairing screen so you can enter your Reachy Mini's address and connect to it when adding the device."
+  },
+  "1.2.2": {
+    "en": "Fixed images and icons. Shorter Readme.txt and Description. Updated app.json."
   }
 }

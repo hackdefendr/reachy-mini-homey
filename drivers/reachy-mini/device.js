@@ -62,6 +62,33 @@ module.exports = class ReachyDevice extends Homey.Device {
     this.client = new ReachyClient(address, { timeout: 8000 });
   }
 
+  // --- mDNS discovery: follow the robot if its IP changes (DHCP) ------------
+  // The device's data.id is the robot's hardware_id, which the daemon also
+  // advertises as the mDNS `unit_id`, so a paired robot re-binds to its own
+  // discovery result automatically — no matter which IP it lands on.
+
+  onDiscoveryResult(discoveryResult) {
+    return discoveryResult.id === this.getData().id;
+  }
+
+  async onDiscoveryAvailable(discoveryResult) {
+    await this._applyDiscoveredAddress(discoveryResult);
+  }
+
+  onDiscoveryAddressChanged(discoveryResult) {
+    this._applyDiscoveredAddress(discoveryResult)
+      .catch((err) => this.error('discovery address update failed:', err.message));
+  }
+
+  async _applyDiscoveredAddress(discoveryResult) {
+    const addr = `${discoveryResult.address}:${discoveryResult.port || 8000}`;
+    if (addr === this.getSetting('address')) return;
+    this.log('mDNS: robot is now at', addr, '- updating address');
+    await this.setSettings({ address: addr }); // setSettings does not fire onSettings
+    this._buildClient(addr);
+    await this._syncFromRobot().catch(() => {});
+  }
+
   // NB: during onSettings, this.getSetting() still returns the OLD value, so we
   // must apply the values from the `newSettings` argument.
   async onSettings({ newSettings, changedKeys }) {

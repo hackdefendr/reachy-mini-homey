@@ -600,6 +600,7 @@
       "connectivity": [
         "lan"
       ],
+      "discovery": "reachy-mini",
       "images": {
         "small": "/drivers/reachy-mini/assets/images/small.png",
         "large": "/drivers/reachy-mini/assets/images/large.png",
@@ -969,5 +970,26 @@
       ],
       "id": "reachy-mini"
     }
-  ]
+  ],
+  "discovery": {
+    "reachy-mini": {
+      "type": "mdns-sd",
+      "mdns-sd": {
+        "name": "reachy-mini",
+        "protocol": "tcp"
+      },
+      "id": "{{txt.unit_id}}",
+      "conditions": [
+        [
+          {
+            "field": "txt.manufacturer",
+            "match": {
+              "type": "string",
+              "value": "Pollen Robotics"
+            }
+          }
+        ]
+      ]
+    }
+  }
 }

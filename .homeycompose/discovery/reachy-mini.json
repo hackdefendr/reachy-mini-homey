@@ -1,0 +1,19 @@
+{
+  "type": "mdns-sd",
+  "mdns-sd": {
+    "name": "reachy-mini",
+    "protocol": "tcp"
+  },
+  "id": "{{txt.unit_id}}",
+  "conditions": [
+    [
+      {
+        "field": "txt.manufacturer",
+        "match": {
+          "type": "string",
+          "value": "Pollen Robotics"
+        }
+      }
+    ]
+  ]
+}

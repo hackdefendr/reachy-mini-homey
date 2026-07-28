@@ -5,13 +5,34 @@
   .reachy-pair #status { margin-top: 16px; min-height: 20px; font-size: 14px; }
   .reachy-pair #status.error { color: var(--homey-color-red-500, #e54d42); }
   .reachy-pair #status.ok { color: var(--homey-color-green-500, #16a34a); }
+  .reachy-pair #found { margin-bottom: 8px; text-align: left; }
+  .reachy-pair .found-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; margin: 8px 0; padding: 12px 16px; box-sizing: border-box;
+    border: 1px solid var(--homey-color-mono-200, #e2e2e2);
+    border-radius: 12px; background: var(--homey-color-mono-050, #fafafa);
+    cursor: pointer; font-size: 15px; text-align: left;
+  }
+  .reachy-pair .found-btn:hover { border-color: var(--homey-color-mono-400, #bbb); }
+  .reachy-pair .found-btn .addr { color: var(--homey-color-mono-500, #888); font-size: 13px; }
+  .reachy-pair .found-btn .go { color: var(--homey-color-blue-500, #2f80ed); font-weight: 600; }
+  .reachy-pair .divider { display: flex; align-items: center; gap: 12px; color: var(--homey-color-mono-400, #bbb); font-size: 13px; margin: 20px 0 12px; }
+  .reachy-pair .divider::before, .reachy-pair .divider::after { content: ""; flex: 1; height: 1px; background: var(--homey-color-mono-200, #e2e2e2); }
 </style>
 
 <div class="reachy-pair">
   <h1 class="homey-title">Connect your Reachy Mini</h1>
-  <p class="hint">Enter the address shown on your Reachy Mini dashboard, for example <b>192.168.1.42:8000</b>.</p>
-  <input id="address" class="homey-form-input" type="text" placeholder="192.168.1.42:8000" autocomplete="off" spellcheck="false">
-  <button id="connect" class="homey-button-primary-full" style="margin-top:16px;">Connect</button>
+
+  <div id="searching" class="hint">Searching your network for Reachy Mini…</div>
+  <div id="found"></div>
+
+  <div id="manual">
+    <div class="divider" id="manual-divider" style="display:none;">or enter it manually</div>
+    <p class="hint" id="manual-hint">Enter the address shown on your Reachy Mini dashboard, for example <b>192.168.1.42:8000</b>.</p>
+    <input id="address" class="homey-form-input" type="text" placeholder="192.168.1.42:8000" autocomplete="off" spellcheck="false">
+    <button id="connect" class="homey-button-primary-full" style="margin-top:16px;">Connect</button>
+  </div>
+
   <div id="status"></div>
 </div>
 
@@ -23,18 +44,21 @@
   var input = document.getElementById('address');
   var button = document.getElementById('connect');
   var statusEl = document.getElementById('status');
+  var foundEl = document.getElementById('found');
+  var searchingEl = document.getElementById('searching');
+  var dividerEl = document.getElementById('manual-divider');
 
   function setStatus(msg, kind) {
     statusEl.textContent = msg || '';
     statusEl.className = kind || '';
   }
 
-  function connect() {
-    var address = (input.value || '').trim();
-    if (!address) { setStatus('Please enter your Reachy Mini address.', 'error'); return; }
+  // Verify the address responds, then create the device from the
+  // {name, data, settings} object test_address returns.
+  function addDevice(address) {
     button.disabled = true;
     setStatus('Connecting…');
-    Homey.emit('test_address', address)
+    return Homey.emit('test_address', address)
       .then(function (device) {
         setStatus('Found ' + device.name + '!', 'ok');
         return Homey.createDevice(device);
@@ -46,7 +70,31 @@
       });
   }
 
+  function connect() {
+    var address = (input.value || '').trim();
+    if (!address) { setStatus('Please enter your Reachy Mini address.', 'error'); return; }
+    addDevice(address);
+  }
+
   button.addEventListener('click', connect);
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') connect(); });
+
+  // Ask the app what it found over mDNS and offer one-tap add for each.
+  Homey.emit('list_discovered')
+    .then(function (devices) {
+      searchingEl.style.display = 'none';
+      if (devices && devices.length) {
+        dividerEl.style.display = 'flex';
+        devices.forEach(function (d) {
+          var btn = document.createElement('button');
+          btn.className = 'found-btn';
+          btn.innerHTML = '<span><b>' + d.name + '</b><br><span class="addr">' + d.address + '</span></span><span class="go">Add</span>';
+          btn.addEventListener('click', function () { addDevice(d.address); });
+          foundEl.appendChild(btn);
+        });
+      }
+    })
+    .catch(function () { searchingEl.style.display = 'none'; });
+
   input.focus();
 </script>

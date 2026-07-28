@@ -14,6 +14,7 @@
   },
   "platforms": ["local"],
   "connectivity": ["lan"],
+  "discovery": "reachy-mini",
   "images": {
     "small": "{{driverAssetsPath}}/images/small.png",
     "large": "{{driverAssetsPath}}/images/large.png",

@@ -43,6 +43,22 @@ module.exports = class ReachyDriver extends Homey.Driver {
    * has a different IP), and we verify it responds before adding the device.
    */
   onPair(session) {
+    // Zero-config path: hand the pair view any Reachy Minis found via mDNS so
+    // the user can add one with a single tap (no IP typing). Falls back to the
+    // manual address entry below when discovery finds nothing.
+    session.setHandler('list_discovered', async () => {
+      const results = this.homey.discovery.getStrategy('reachy-mini').getDiscoveryResults();
+      return Object.values(results || {}).map((r) => {
+        const model = (r.txt && r.txt.model) || 'Reachy Mini';
+        const robot = r.txt && r.txt.robot_name;
+        return {
+          id: r.id,
+          address: `${r.address}:${r.port || 8000}`,
+          name: robot ? `${model} (${robot})` : model,
+        };
+      });
+    });
+
     session.setHandler('test_address', async (address) => {
       const addr = String(address || '').trim();
       const client = new ReachyClient(addr, { timeout: 6000 });

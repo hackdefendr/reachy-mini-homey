@@ -13,5 +13,8 @@
   },
   "1.2.2": {
     "en": "Fixed images and icons. Shorter Readme.txt and Description. Updated app.json."
+  },
+  "1.3.0": {
+    "en": "Adds automatic discovery: your Reachy Mini is now found on the network while pairing, so you can add it with a single tap instead of typing an IP address. A paired robot also keeps working if its IP address changes."
   }
 }

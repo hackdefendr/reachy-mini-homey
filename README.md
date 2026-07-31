@@ -70,12 +70,15 @@ A **Reachy Mini** device with a **volume** slider and an **Awake** (wake/sleep) 
    home / ask the weather, which needs the advanced setup below.
 
 ### Voice control & conversational weather (advanced, optional)
-Letting you *talk to Reachy* to control your home and ask the weather requires two small Python
-tools on the robot itself (the Reachy is a Linux device you reach over SSH). The app makes this
-easy: open the app's **settings page → “Reachy Voice Control & Weather — Setup”**, paste a
-**Homey API key** (from my.homey.app → API Keys), and it **generates a complete copy-paste command**
-you run once on the robot over SSH. It installs the `control_home` and `get_time_and_weather` tools
-and points them at this app's API. (A fully SSH-free companion app is planned.)
+Letting you *talk to Reachy* to control your home and ask the weather needs the `control_home` and
+`get_time_and_weather` tools on the robot. The easy, **SSH-free** way is the **Homey Companion** app
+for Reachy Mini: install it from your robot's dashboard (Pollen / Hugging Face app store), then open
+this app's **settings page → “Reachy Voice Control & Weather — Setup”** to copy your **Homey app URL**
+and create a **Homey API key**. Paste both into the companion's settings page
+(`http://reachy-mini.local:7860/homey`), Save, and restart the app. The companion bundles the tools,
+adds a home-assistant personality, and points them at this app's API — no SSH required. The Homey
+"Start conversation" action launches it automatically. (An SSH-based method is still available on the
+setup page for those who prefer it.)
 
 ## Flow cards
 **Triggers:** A face appeared · Heard someone speak · Reachy received a command.

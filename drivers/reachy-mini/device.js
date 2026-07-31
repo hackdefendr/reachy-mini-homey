@@ -11,7 +11,12 @@ const MOTION_THRESHOLD = 0.25; // rad (~14°) of head/body yaw = "looking at som
 const DOA_POLL_INTERVAL = 500; // ms
 const DOA_COOLDOWN = 2500; // ms minimum between heard_speech fires
 const TTS_FILENAME = 'homey-tts.mp3';
-const CONVERSATION_APP = 'reachy_mini_conversation_app';
+// The on-robot app that provides two-way voice. Prefer the Homey Companion app
+// (it bundles the Homey control tools + a home-assistant personality); fall back
+// to Pollen's stock conversation app if the companion isn't installed.
+const CONVERSATION_APP = 'homey_companion';
+const FALLBACK_CONVERSATION_APP = 'reachy_mini_conversation_app';
+const isConversationApp = (name) => name === CONVERSATION_APP || name === FALLBACK_CONVERSATION_APP;
 const HEAL_COOLDOWN = 90 * 1000; // ms minimum between self-heal attempts
 
 // Head pose to look in a direction (radians). 90° DOA ≈ front.
@@ -139,7 +144,7 @@ module.exports = class ReachyDevice extends Homey.Device {
     try {
       const status = await this.client.getCurrentApp();
       const appName = status && status.info && status.info.name;
-      if (!appName || appName === CONVERSATION_APP) return; // no app / conversation: leave alone
+      if (!appName || isConversationApp(appName)) return; // no app / conversation: leave alone
 
       const motors = await this.client.getMotorStatus();
       // A healthy tracker keeps motors 'enabled' to hold/move the head. Motors
@@ -307,8 +312,15 @@ module.exports = class ReachyDevice extends Homey.Device {
    * app runs at a time, so this stops the eyes/face-tracker first.
    */
   async startConversation() {
-    await this.client.switchToApp(CONVERSATION_APP);
-    this.log('Conversation mode started');
+    try {
+      await this.client.switchToApp(CONVERSATION_APP);
+      this.log('Conversation mode started (Homey Companion)');
+    } catch (err) {
+      // Companion app not installed on the robot — fall back to the stock app.
+      this.log('Homey Companion unavailable, using stock conversation app:', err.message);
+      await this.client.startApp(FALLBACK_CONVERSATION_APP);
+      this.log('Conversation mode started (stock conversation app)');
+    }
   }
 
   /**
@@ -322,7 +334,7 @@ module.exports = class ReachyDevice extends Homey.Device {
       const res = await this.client.getStartupApp();
       startup = res && res.startup_app;
     } catch (_err) { /* ignore */ }
-    if (startup && startup !== CONVERSATION_APP) {
+    if (startup && !isConversationApp(startup)) {
       // Wake the robot BEFORE starting the app. Apps like the face-tracker take
       // over the motors in whatever state they find them; starting on a relaxed
       // robot leaves the head drooping in standby. Waking first (motors enabled

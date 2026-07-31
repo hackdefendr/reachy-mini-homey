@@ -6,109 +6,102 @@
   .rc .field { margin: 12px 0; }
   .rc label { display: block; font-weight: 600; margin-bottom: 4px; }
   .rc input[type=text] { width: 100%; }
-  .rc textarea { width: 100%; min-height: 200px; font-family: monospace; font-size: 12px; white-space: pre; }
   .rc .muted { color: var(--homey-color-mono-500, #888); font-size: 13px; }
   .rc .row { display: flex; gap: 8px; align-items: center; }
-  .rc #copied { color: var(--homey-color-green-500, #16a34a); font-size: 13px; }
+  .rc .copied { color: var(--homey-color-green-500, #16a34a); font-size: 13px; }
   .rc ol { padding-left: 20px; }
+  .rc .urlbox { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+  .rc .urlbox code { flex: 1; }
 </style>
 
 <div class="rc">
   <h1 class="homey-title">Reachy Voice Control &amp; Weather — Setup</h1>
   <p>Everything else in this app works without setup — just pair your robot. This page is <b>only</b>
-     for the advanced feature that lets you <b>talk to Reachy to control your home and ask the weather</b>.
-     It installs two small tools on the robot itself (a Linux device you reach over SSH).</p>
+     for the advanced feature that lets you <b>talk to Reachy to control your home and ask the weather</b>.</p>
+  <p>The easy, SSH-free way is the <b>Homey Companion</b> app for Reachy Mini: install it from your
+     robot's dashboard (Pollen / Hugging Face app store), then connect it to this Homey using the two
+     values below. <span class="muted">(The old SSH method still works if you prefer it — see the note
+     at the bottom.)</span></p>
 
   <h2>Step 1 — Create a Homey API key</h2>
   <p>Open <a href="https://my.homey.app" target="_blank">my.homey.app</a> → <b>Settings → API Keys → Create</b>
-     (allow device &amp; flow access), then paste it here:</p>
+     (allow device &amp; flow access), then copy it. You'll paste it into the companion app.</p>
   <div class="field">
     <label for="apikey">Homey API Key</label>
-    <input id="apikey" type="text" class="homey-form-input" placeholder="paste your Homey API key" autocomplete="off" spellcheck="false">
-  </div>
-
-  <h2>Step 2 — Generate your robot setup command</h2>
-  <p class="muted">Your Homey endpoints (filled in automatically):</p>
-  <p class="muted">Command: <code id="cmdUrl">…</code><br>Info: <code id="infoUrl">…</code></p>
-  <button id="gen" class="homey-button-primary-full">Generate setup command</button>
-
-  <div id="output" style="display:none;">
-    <h2>Step 3 — Run it on your Reachy</h2>
-    <ol>
-      <li>SSH into your robot: <code>ssh pollen@YOUR-ROBOT-IP</code></li>
-      <li>Paste the whole command below and press Enter.</li>
-      <li>Restart the <b>conversation app</b> from your Reachy dashboard.</li>
-    </ol>
-    <div class="row">
-      <button id="copy" class="homey-button-secondary">Copy</button>
-      <span id="copied"></span>
+    <div class="urlbox">
+      <input id="apikey" type="text" class="homey-form-input" placeholder="paste to check / keep it handy" autocomplete="off" spellcheck="false">
+      <button id="copyKey" class="homey-button-secondary">Copy</button>
     </div>
-    <textarea id="script" readonly></textarea>
-    <p class="muted">This downloads the two tools from
-       <a href="https://github.com/hackdefendr/reachy-mini-homey/tree/main/robot-tools" target="_blank">GitHub</a>
-       and writes the robot's <code>.env</code>. Requires the Reachy <b>conversation app</b> to already be
-       installed on the robot, and the robot to have internet access.</p>
+    <span id="copiedKey" class="copied"></span>
   </div>
+
+  <h2>Step 2 — Copy your Homey app URL</h2>
+  <p>This is the address the robot calls. Copy it (filled in automatically):</p>
+  <div class="urlbox">
+    <code id="appUrl">…</code>
+    <button id="copyUrl" class="homey-button-secondary">Copy</button>
+  </div>
+  <span id="copiedUrl" class="copied"></span>
+
+  <h2>Step 3 — Connect in the Homey Companion app</h2>
+  <ol>
+    <li>On your Reachy Mini dashboard, install and open <b>Homey Companion</b>.</li>
+    <li>Open its settings page (the gear), which is served at
+        <code>http://reachy-mini.local:7860/homey</code>.</li>
+    <li>Paste the <b>Homey app URL</b> (Step 2) and your <b>Homey API key</b> (Step 1), press
+        <b>Test connection</b>, then <b>Save</b>.</li>
+    <li>Restart the app on the robot. Now say things like
+        <i>“Reachy, turn off the living room lights”</i> or <i>“what's the weather?”</i></li>
+  </ol>
+
+  <details style="margin-top:20px;">
+    <summary class="muted" style="cursor:pointer;">Advanced: manual SSH method (old way)</summary>
+    <p class="muted">If you don't want to use the companion app, you can still install the two Python
+       tools directly. SSH into the robot and place
+       <a href="https://github.com/hackdefendr/reachy-mini-homey/tree/main/robot-tools" target="_blank">these tools</a>
+       in a folder, then set <code>AUTOLOAD_EXTERNAL_TOOLS=1</code>,
+       <code>REACHY_MINI_EXTERNAL_TOOLS_DIRECTORY</code>, <code>HOMEY_COMMAND_URL</code>
+       (<code id="cmdUrl">…</code>), <code>HOMEY_INFO_URL</code> (<code id="infoUrl">…</code>) and
+       <code>HOMEY_API_TOKEN</code> in the conversation app's <code>.env</code>, and restart it.</p>
+  </details>
 </div>
 
 <script type="text/javascript">
   function onHomeyReady(Homey) {
     Homey.ready();
 
-    var RAW = 'https://raw.githubusercontent.com/hackdefendr/reachy-mini-homey/main/robot-tools';
-    var cmdUrl = '';
-    var infoUrl = '';
-
     Homey.api('GET', '/setup', null, function (err, result) {
-      if (err || !result || !result.commandUrl) {
-        document.getElementById('cmdUrl').textContent = '(could not detect — is the app installed?)';
+      if (err || !result || !result.appUrl) {
+        document.getElementById('appUrl').textContent = '(could not detect — is the app installed?)';
         return;
       }
-      cmdUrl = result.commandUrl;
-      infoUrl = result.infoUrl;
-      document.getElementById('cmdUrl').textContent = cmdUrl;
-      document.getElementById('infoUrl').textContent = infoUrl;
+      document.getElementById('appUrl').textContent = result.appUrl;
+      document.getElementById('cmdUrl').textContent = result.commandUrl || '';
+      document.getElementById('infoUrl').textContent = result.infoUrl || '';
     });
 
-    function buildScript(key) {
-      return [
-        '#!/usr/bin/env bash',
-        '# Reachy Mini — Homey voice-control setup. Run on your Reachy over SSH.',
-        'set -e',
-        '# Stable tools folder — survives conversation-app updates/reinstalls.',
-        'TOOLS="$HOME/homey_tools"',
-        'mkdir -p "$TOOLS"',
-        'CWD="$(find /venvs -type d -path \'*reachy_mini/daemon/app/services/wireless\' 2>/dev/null | head -1)"',
-        '[ -z "$CWD" ] && CWD="$HOME"',
-        'echo "Downloading Homey tools…"',
-        'curl -fsSL "' + RAW + '/homey_control.py" -o "$TOOLS/homey_control.py"',
-        'curl -fsSL "' + RAW + '/homey_info.py" -o "$TOOLS/homey_info.py"',
-        'cat > "$CWD/.env" <<HOMEY_ENV_EOF',
-        'AUTOLOAD_EXTERNAL_TOOLS=1',
-        'REACHY_MINI_EXTERNAL_TOOLS_DIRECTORY=$TOOLS',
-        'HOMEY_COMMAND_URL=' + cmdUrl,
-        'HOMEY_INFO_URL=' + infoUrl,
-        'HOMEY_API_TOKEN=' + key,
-        'HOMEY_ENV_EOF',
-        'echo "Done. Now restart the conversation app from your Reachy dashboard."',
-        '',
-      ].join('\n');
+    function copyText(text, labelEl) {
+      var ok = false;
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (e) { ok = false; }
+      labelEl.textContent = ok ? 'Copied!' : 'Copy manually.';
+      setTimeout(function () { labelEl.textContent = ''; }, 2500);
     }
 
-    document.getElementById('gen').addEventListener('click', function () {
-      var key = document.getElementById('apikey').value.trim();
-      if (!key) { alert('Please paste your Homey API key first.'); return; }
-      if (!cmdUrl) { alert('Still detecting your Homey URL — try again in a moment.'); return; }
-      document.getElementById('script').value = buildScript(key);
-      document.getElementById('output').style.display = 'block';
+    document.getElementById('copyUrl').addEventListener('click', function () {
+      var url = document.getElementById('appUrl').textContent.trim();
+      if (url && url[0] === 'h') copyText(url, document.getElementById('copiedUrl'));
     });
 
-    document.getElementById('copy').addEventListener('click', function () {
-      var ta = document.getElementById('script');
-      ta.select();
-      try { document.execCommand('copy'); document.getElementById('copied').textContent = 'Copied!'; }
-      catch (e) { document.getElementById('copied').textContent = 'Select all and copy manually.'; }
-      setTimeout(function () { document.getElementById('copied').textContent = ''; }, 2500);
+    document.getElementById('copyKey').addEventListener('click', function () {
+      var key = document.getElementById('apikey').value.trim();
+      if (key) copyText(key, document.getElementById('copiedKey'));
     });
   }
 </script>

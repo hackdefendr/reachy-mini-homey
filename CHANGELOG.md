@@ -4,6 +4,24 @@ All notable changes to the Reachy Mini Controller app are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) and the
 [Keep a Changelog](https://keepachangelog.com/) format.
 
+## [1.4.0] — 2026-07-31
+
+Focus: SSH-free voice-control setup via the new **Homey Companion** app for Reachy Mini.
+
+### Added
+- **Homey Companion integration** — the "Start conversation" action now launches the `homey_companion`
+  app on the robot (installable from the Pollen/Hugging Face app store), which bundles the
+  `control_home` and `get_time_and_weather` tools and a home-assistant personality. No SSH required.
+- **`appUrl` in the setup endpoint** — the settings page now shows a copy-ready Homey app URL to paste
+  into the companion.
+
+### Changed
+- **Voice Control setup page** rewritten around the companion: copy your Homey app URL + API key and
+  paste them into the companion's `/homey` settings page. The previous SSH command method is kept as a
+  collapsed "Advanced" option.
+- **Start conversation** falls back to the standard conversation app if the companion isn't installed;
+  standby self-heal and stop-conversation now recognize either app as conversation mode.
+
 ## [1.2.0] — 2026-07-24
 
 Focus: make the app installable and configurable by anyone, not just the original developer.

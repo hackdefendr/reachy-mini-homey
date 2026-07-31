@@ -102,6 +102,7 @@ module.exports = class ReachyApp extends Homey.App {
     const base = cloudId ? `https://${cloudId}.connect.athom.com/api/app/co.hf.reachy` : '';
     return {
       cloudId,
+      appUrl: base,
       commandUrl: base ? `${base}/command` : '',
       infoUrl: base ? `${base}/info` : '',
     };

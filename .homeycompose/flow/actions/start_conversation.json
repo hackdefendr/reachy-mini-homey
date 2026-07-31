@@ -2,7 +2,7 @@
   "id": "start_conversation",
   "title": { "en": "Start conversation mode" },
   "titleFormatted": { "en": "Start conversation mode" },
-  "hint": { "en": "Switch Reachy into two-way voice conversation (talk and it replies). This stops the face-tracker/eyes. Pick a personality in the conversation app's web UI on port 7860." },
+  "hint": { "en": "Switch Reachy into two-way voice conversation (talk and it replies), using the Homey Companion app on the robot (or the stock conversation app if it isn't installed). This stops the face-tracker/eyes. Connect Homey on the companion's settings page (port 7860, /homey)." },
   "args": [
     {
       "type": "device",

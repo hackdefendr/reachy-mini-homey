@@ -4,6 +4,14 @@ All notable changes to the Reachy Mini Controller app are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) and the
 [Keep a Changelog](https://keepachangelog.com/) format.
 
+## [1.4.1] — 2026-08-01
+
+### Fixed
+- **Head drooping into standby during conversation mode.** While a conversation app (Homey
+  Companion or the stock app) is running, the robot could relax its motors during idle silence and
+  droop. The device now runs a keep-awake loop that re-asserts motor torque (and lifts the head if it
+  had already drooped) — without restarting the app, so it never cuts off the conversation.
+
 ## [1.4.0] — 2026-07-31
 
 Focus: SSH-free voice-control setup via the new **Homey Companion** app for Reachy Mini.

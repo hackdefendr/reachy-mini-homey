@@ -22,5 +22,8 @@
   },
   "1.4.0": {
     "en": "Voice control is now SSH-free: install the new Homey Companion app on your Reachy Mini from the robot's app store, then just paste your Homey app URL and API key on its settings page — no more SSH. The Start conversation action launches the companion automatically (and falls back to the standard conversation app if it isn't installed). The in-app setup page has been updated to match."
+  },
+  "1.4.1": {
+    "en": "Fixes Reachy's head drooping into standby while in conversation mode: the app now keeps the conversation app's head held up during idle silence, without interrupting the conversation."
   }
 }

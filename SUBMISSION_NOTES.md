@@ -1,10 +1,31 @@
 # App Store Submission Notes — Reachy Mini Controller
 
 **App ID:** `co.hf.reachy`
+**App version:** `1.4.0`
 **Permission under review:** `homey:manager:api`
 
 These notes explain, in detail, why this app requests `homey:manager:api`, exactly how it is used,
 and the strict limits on that use — so the review team can assess it quickly.
+
+---
+
+## 0. What changed in 1.4.0 (and why this review is unaffected)
+
+Version 1.4.0 adds a **Homey Companion** app for the Reachy Mini robot that makes voice-control
+setup **SSH-free**: instead of manually copying Python tools onto the robot over SSH, the user
+installs the companion app on the robot and pastes their Homey app URL + API key into its settings
+page.
+
+**Nothing about this app's `homey:manager:api` usage changed.** The companion still calls the same
+single protected endpoint (`POST /api/app/co.hf.reachy/command`), with the same authenticated
+request and the same `{ "command": "..." }` body. The permission scope, the three Web API
+operations, the written-capability allow-list, and all safeguards described below are identical to
+prior versions. The only Homey-side code change relevant here is a one-line addition to the setup
+page's helper (`getSetupInfo()` now also returns the app's base URL for the user to copy), which
+uses **no new permission**.
+
+The companion app itself is a separate, open-source project (a Hugging Face Space) that runs on the
+robot, not inside this Homey app, and is therefore outside the scope of this permission review.
 
 ---
 
@@ -47,7 +68,8 @@ device or app settings.
 Device control is only ever invoked **in direct response to a user's spoken command**, never on a
 timer or in the background. The flow is:
 
-1. The user speaks to the Reachy robot (running the on-robot conversation app).
+1. The user speaks to the Reachy robot (running the **Homey Companion** app, or the stock
+   conversation app with the tools installed).
 2. The robot's assistant calls a `control_home` tool, which makes an authenticated HTTP request to
    this app's own API endpoint:
    `POST /api/app/co.hf.reachy/command` with body `{ "command": "<the spoken request>" }`.
@@ -82,8 +104,8 @@ their own automations, but that path uses the normal Flow system, not `homey:man
 
 The `homey:manager:api` usage is entirely self-contained in the Homey app and can be exercised
 without the robot: the endpoint `POST /api/app/co.hf.reachy/command` accepts a JSON command and will
-control devices and return a confirmation. (The robot-side conversation tool is optional user setup
-that lives on the robot, not in this app.)
+control devices and return a confirmation. (The robot-side `control_home` tool — provided by the
+optional Homey Companion app — lives on the robot, not in this app.)
 
 ### How to reproduce (optional)
 With a Homey API key, from any HTTP client on the local network:

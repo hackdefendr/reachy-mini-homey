@@ -6,6 +6,7 @@ const tts = require('../../lib/tts');
 const weather = require('../../lib/weather');
 
 const POLL_INTERVAL = 30 * 1000; // ms
+const KEEPAWAKE_INTERVAL = 15 * 1000; // ms — hold a conversation app's head up during idle
 const MOTION_POLL_INTERVAL = 1000; // ms
 const MOTION_THRESHOLD = 0.25; // rad (~14°) of head/body yaw = "looking at something"
 const DOA_POLL_INTERVAL = 500; // ms
@@ -57,6 +58,7 @@ module.exports = class ReachyDevice extends Homey.Device {
 
     await this._syncFromRobot();
     this._poll = this.homey.setInterval(() => this._pollTick(), POLL_INTERVAL);
+    this._keepAwake = this.homey.setInterval(() => this._keepConversationAwake(), KEEPAWAKE_INTERVAL);
 
     await this._applyVision();
     await this._applyEars();
@@ -119,8 +121,41 @@ module.exports = class ReachyDevice extends Homey.Device {
 
   _teardown() {
     if (this._poll) this.homey.clearInterval(this._poll);
+    if (this._keepAwake) this.homey.clearInterval(this._keepAwake);
     this._stopMotionPoll();
     this._stopDoaPoll();
+  }
+
+  /**
+   * Keep a running conversation app's head from drooping into standby.
+   *
+   * The conversation app (e.g. Homey Companion) holds its head while speaking or
+   * animating, but during idle silence the robot can relax its motors and droop.
+   * `_selfHealDroop` deliberately leaves conversation apps alone (restarting one
+   * would cut off the conversation), so this holds the head up instead: it just
+   * re-asserts motor torque, and lifts the head back to neutral if it had already
+   * drooped — never restarting the app.
+   */
+  async _keepConversationAwake() {
+    if (this.getCapabilityValue('onoff') === false) return; // intentionally asleep
+    try {
+      const status = await this.client.getCurrentApp();
+      const appName = status && status.info && status.info.name;
+      if (!appName || !isConversationApp(appName)) return; // only conversation apps
+
+      const motors = await this.client.getMotorStatus();
+      if (motors && motors.mode === 'enabled') {
+        // Already holding — re-assert so the daemon doesn't relax into standby.
+        await this.client.setMotorMode('enabled').catch(() => {});
+        return;
+      }
+      // Motors have relaxed and the head has drooped — wake it back up (enable + lift).
+      this.log(`Keep-awake: '${appName}' head drooped during idle; re-holding it up`);
+      await this.client.setMotorMode('enabled').catch(() => {});
+      await this.client.wakeUp().catch(() => {});
+    } catch (_err) {
+      // Transient robot/media-busy states are expected here; ignore.
+    }
   }
 
   /** Periodic tick: keep availability/volume in sync and self-heal droop. */

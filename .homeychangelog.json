@@ -25,5 +25,8 @@
   },
   "1.4.1": {
     "en": "Fixes Reachy's head drooping into standby while in conversation mode: the app now keeps the conversation app's head held up during idle silence, without interrupting the conversation."
+  },
+  "1.5.0": {
+    "en": "Reachy now remembers. In conversation mode it can recall what you told it earlier — your name, preferences, or plans — even after a reboot or app update, so you can pick up where you left off and ask \"do you remember…?\". The memory is kept small and lives on your Homey, and you can tell Reachy to forget it any time."
   }
 }

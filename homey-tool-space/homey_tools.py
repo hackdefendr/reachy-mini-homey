@@ -77,3 +77,42 @@ def get_time_and_weather() -> Dict[str, Any]:
     if message:
         return {"status": "success", "message": message}
     return {"status": "error", "message": "I couldn't get the time and weather."}
+
+
+def recall_memory() -> Dict[str, Any]:
+    """Recall what you remember about the user from earlier conversations.
+
+    Returns:
+        A short summary plus recent notes, to speak from naturally.
+    """
+    result = _request("/memory")
+    if not isinstance(result, dict) or result.get("status") == "error":
+        message = result.get("message") if isinstance(result, dict) else None
+        return {"status": "error", "message": message or "I couldn't reach Homey."}
+    preamble = (result.get("preamble") or "").strip()
+    if not preamble:
+        return {"status": "success", "message": "I don't have any earlier notes about this user yet."}
+    return {"status": "success", "message": preamble}
+
+
+def remember(text: str, kind: str = "note") -> Dict[str, Any]:
+    """Save something worth remembering for future conversations.
+
+    Args:
+        text: The thing to remember — one short sentence for a note, or a
+            one-paragraph summary when kind is "digest".
+        kind: "note" for a single fact (default), or "digest" to replace the
+            running end-of-conversation summary.
+
+    Returns:
+        A short confirmation to say back to the user.
+    """
+    text = (text or "").strip()
+    if not text:
+        return {"status": "error", "message": "There was nothing to remember."}
+    kind = (kind or "note").strip() or "note"
+    result = _request("/memory", {"text": text, "kind": kind})
+    if isinstance(result, dict) and result.get("status") == "ok":
+        return {"status": "success", "message": "Got it — I'll remember that."}
+    message = result.get("message") if isinstance(result, dict) else None
+    return {"status": "error", "message": message or "I couldn't save that to Homey."}

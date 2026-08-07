@@ -105,7 +105,103 @@ module.exports = class ReachyApp extends Homey.App {
       appUrl: base,
       commandUrl: base ? `${base}/command` : '',
       infoUrl: base ? `${base}/info` : '',
+      memoryUrl: base ? `${base}/memory` : '',
     };
+  }
+
+  // ---- Short-term conversation memory --------------------------------------
+  // A small, durable notepad the robot reads/writes through the same tool ->
+  // endpoint bridge as everything else. It lives in Homey settings, which
+  // survive reboots and app/robot upgrades (the robot side does not). The
+  // robot's LLM decides WHAT is worth remembering; Homey only stores it and
+  // keeps the footprint small (count cap, byte budget, day age-out).
+  static get _MEM() {
+    return { KEY: 'memory', FACT_CAP: 24, FACT_CHARS: 240, DIGEST_CHARS: 700, BUDGET: 6000, KEEP_DAYS: 2 };
+  }
+
+  _loadMemory() {
+    const m = this.homey.settings.get(ReachyApp._MEM.KEY);
+    return (m && typeof m === 'object')
+      ? { v: 1, facts: [], digest: '', updatedAt: 0, ...m }
+      : { v: 1, facts: [], digest: '', updatedAt: 0 };
+  }
+
+  /** Local "YYYY-MM-DD" in the home's timezone, for day-based age-out. */
+  _dayKey(ts = Date.now()) {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: this.homey.clock.getTimezone() }).format(new Date(ts));
+  }
+
+  /**
+   * Recall memory as structured data plus a ready-to-inject preamble the
+   * conversation app prepends to its system prompt. Compaction runs (and is
+   * persisted) even on a read, so stale entries trim after a reboot.
+   * @returns {Promise<{digest: string, facts: object[], preamble: string}>}
+   */
+  async recallMemory() {
+    const mem = this._compact(this._loadMemory());
+    this.homey.settings.set(ReachyApp._MEM.KEY, mem);
+    const today = this._dayKey();
+    const lines = mem.facts.map((f) => `- (${f.day === today ? 'today' : f.day}) ${f.text}`);
+    const preamble = [
+      mem.digest ? `What you remember about the user so far: ${mem.digest}` : '',
+      lines.length ? `Recent notes:\n${lines.join('\n')}` : '',
+    ].filter(Boolean).join('\n\n');
+    return { digest: mem.digest, facts: mem.facts, preamble };
+  }
+
+  /**
+   * Store a fact, or (body.kind === 'digest') replace the running long-term
+   * digest wholesale — the deliberate end-of-session overwrite that keeps the
+   * footprint small.
+   * @param {{text?: string, kind?: string}} body
+   */
+  async rememberMemory(body) {
+    const text = String(body.text || '').trim();
+    if (!text) throw new Error('Nothing to remember');
+    const mem = this._loadMemory();
+    if (body.kind === 'digest') {
+      mem.digest = text.slice(0, ReachyApp._MEM.DIGEST_CHARS);
+    } else {
+      mem.facts.push({ t: Date.now(), day: this._dayKey(), text: text.slice(0, ReachyApp._MEM.FACT_CHARS) });
+    }
+    mem.updatedAt = Date.now();
+    const saved = this._compact(mem);
+    this.homey.settings.set(ReachyApp._MEM.KEY, saved);
+    this.log('memory:', body.kind === 'digest' ? 'digest updated' : `+fact (${saved.facts.length} kept)`);
+    return { status: 'ok', facts: saved.facts.length, digest: !!saved.digest };
+  }
+
+  /** Forget everything — for a "forget what we talked about" command. */
+  async forgetMemory() {
+    this.homey.settings.set(ReachyApp._MEM.KEY, { v: 1, facts: [], digest: '', updatedAt: Date.now() });
+    this.log('memory: cleared');
+    return { status: 'ok' };
+  }
+
+  /** Mechanical compaction — the only policy Homey applies to memory. */
+  _compact(mem) {
+    const C = ReachyApp._MEM;
+    const today = this._dayKey();
+    // 1. Age-out: keep only facts from the last KEEP_DAYS distinct days.
+    const recentDays = new Set(
+      [...new Set((mem.facts || []).map((f) => f && f.day).filter(Boolean))]
+        .sort().reverse().slice(0, C.KEEP_DAYS),
+    );
+    let facts = (mem.facts || [])
+      .filter((f) => f && f.text && (recentDays.has(f.day) || f.day === today))
+      .map((f) => ({ t: f.t || 0, day: f.day || today, text: String(f.text).slice(0, C.FACT_CHARS) }))
+      .sort((a, b) => a.t - b.t);
+    // 2. Count cap: keep the newest FACT_CAP.
+    if (facts.length > C.FACT_CAP) facts = facts.slice(-C.FACT_CAP);
+    const out = {
+      v: 1,
+      facts,
+      digest: String(mem.digest || '').slice(0, C.DIGEST_CHARS),
+      updatedAt: mem.updatedAt || Date.now(),
+    };
+    // 3. Byte budget: evict oldest facts until the blob is under BUDGET.
+    while (out.facts.length > 1 && JSON.stringify(out).length > C.BUDGET) out.facts.shift();
+    return out;
   }
 
   /**

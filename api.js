@@ -18,4 +18,17 @@ module.exports = {
   async setup({ homey }) {
     return homey.app.getSetupInfo();
   },
+  // Recall stored short-term memory (running digest + recent facts), plus a
+  // ready-to-inject preamble the conversation app prepends to its prompt.
+  async memory({ homey }) {
+    return homey.app.recallMemory();
+  },
+  // Store a fact, or (kind:"digest") replace the running long-term digest.
+  async remember({ homey, body }) {
+    return homey.app.rememberMemory(body || {});
+  },
+  // Forget everything ("forget what we talked about").
+  async forget({ homey }) {
+    return homey.app.forgetMemory();
+  },
 };

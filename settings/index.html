@@ -61,7 +61,8 @@
        <a href="https://github.com/hackdefendr/reachy-mini-homey/tree/main/robot-tools" target="_blank">these tools</a>
        in a folder, then set <code>AUTOLOAD_EXTERNAL_TOOLS=1</code>,
        <code>REACHY_MINI_EXTERNAL_TOOLS_DIRECTORY</code>, <code>HOMEY_COMMAND_URL</code>
-       (<code id="cmdUrl">…</code>), <code>HOMEY_INFO_URL</code> (<code id="infoUrl">…</code>) and
+       (<code id="cmdUrl">…</code>), <code>HOMEY_INFO_URL</code> (<code id="infoUrl">…</code>),
+       <code>HOMEY_MEMORY_URL</code> (<code id="memUrl">…</code>) and
        <code>HOMEY_API_TOKEN</code> in the conversation app's <code>.env</code>, and restart it.</p>
   </details>
 </div>
@@ -78,6 +79,7 @@
       document.getElementById('appUrl').textContent = result.appUrl;
       document.getElementById('cmdUrl').textContent = result.commandUrl || '';
       document.getElementById('infoUrl').textContent = result.infoUrl || '';
+      document.getElementById('memUrl').textContent = result.memoryUrl || '';
     });
 
     function copyText(text, labelEl) {

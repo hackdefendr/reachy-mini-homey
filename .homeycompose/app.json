@@ -1,6 +1,6 @@
 {
   "id": "co.hf.reachy",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "compatibility": ">=12.4.0",
   "sdk": 3,
   "runtime": "nodejs",
@@ -33,6 +33,18 @@
     "setup": {
       "method": "GET",
       "path": "/setup"
+    },
+    "memory": {
+      "method": "GET",
+      "path": "/memory"
+    },
+    "remember": {
+      "method": "POST",
+      "path": "/memory"
+    },
+    "forget": {
+      "method": "DELETE",
+      "path": "/memory"
     }
   },
   "images": {

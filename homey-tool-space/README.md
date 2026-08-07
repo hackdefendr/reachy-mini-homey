@@ -19,9 +19,12 @@ An MCP tool Space that lets the [Reachy Mini](https://www.pollen-robotics.com/) 
 **control your [Homey](https://homey.app) smart home** and read your **real local time & weather** —
 by voice. It pairs with the **Reachy Mini Controller** Homey app.
 
-It exposes two MCP tools:
+It exposes these MCP tools:
 - **`control_home`** — turn devices/lights on/off, brightness, colour, volume, mute, play/pause.
 - **`get_time_and_weather`** — the user's actual local time and current weather (from Homey).
+- **`recall_memory`** — what Reachy remembers about the user from earlier conversations.
+- **`remember`** — save a note now, or a one-paragraph summary at the end of a chat, so
+  Reachy can pick up where it left off after a reboot or upgrade.
 
 ## Setup
 

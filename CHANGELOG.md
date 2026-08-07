@@ -4,6 +4,22 @@ All notable changes to the Reachy Mini Controller app are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/) and the
 [Keep a Changelog](https://keepachangelog.com/) format.
 
+## [1.5.0] — 2026-08-07
+
+Focus: short-term conversation memory, so Reachy can pick up where it left off.
+
+### Added
+- **Conversation memory** — in conversation mode Reachy can now remember things across
+  conversations (your name, preferences, plans) and recall them later, so it survives a reboot or
+  app update and can answer "do you remember…?". Backed by two new conversation tools, `remember`
+  and `recall_memory`.
+- **`/memory` app API** (GET recall, POST remember, DELETE forget) — stores a small running summary
+  plus recent notes in Homey settings, which persist across restarts. The footprint is capped
+  automatically (recent-day age-out, a note limit, and a byte budget), so it never grows unbounded.
+- **`memoryUrl` in the setup endpoint**, and the Voice Control setup page's SSH note now lists
+  `HOMEY_MEMORY_URL`.
+- The Homey Companion / tool Space gains `remember` and `recall_memory` MCP tools.
+
 ## [1.4.1] — 2026-08-01
 
 ### Fixed

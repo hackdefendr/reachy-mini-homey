@@ -1,13 +1,15 @@
 """Gradio MCP app for the Reachy Mini Homey Tool Space.
 
-Exposes two MCP tools the Reachy conversation app can call:
+Exposes MCP tools the Reachy conversation app can call:
   - control_home            : control Homey devices by voice
   - get_time_and_weather    : the user's real local time + weather from Homey
+  - recall_memory           : what Reachy remembers from earlier conversations
+  - remember                : save a note, or an end-of-chat summary, for next time
 """
 
 import gradio as gr
 
-from homey_tools import control_home, get_time_and_weather
+from homey_tools import control_home, get_time_and_weather, recall_memory, remember
 
 CONTROL_DESCRIPTION = (
     "Control the user's Homey smart home: turn devices or lights on or off, set "
@@ -21,6 +23,19 @@ INFO_DESCRIPTION = (
     "home. Call this directly whenever the user asks what time it is, what the "
     "weather is like, or to announce the time and/or weather. Do not just say "
     "you'll check."
+)
+RECALL_DESCRIPTION = (
+    "Recall what you remember about this user from earlier conversations: a short "
+    "summary plus recent notes. Call this at the START of a conversation and "
+    "whenever the user refers to something from before or asks whether you "
+    "remember something. Speak from it naturally — do not read it out verbatim."
+)
+REMEMBER_DESCRIPTION = (
+    "Save something worth remembering for future conversations — the user's name, "
+    "preferences, plans, or facts about their home and life. Call this whenever "
+    "the user shares something durable, keeping each note to one short sentence. "
+    "At the END of a conversation, call it once with kind='digest' and a "
+    "one-paragraph summary of what mattered; that replaces the previous summary."
 )
 
 with gr.Blocks(title="Reachy Mini Homey Tool") as demo:
@@ -42,10 +57,26 @@ with gr.Blocks(title="Reachy Mini Homey Tool") as demo:
     info_output = gr.JSON(label="Time & weather")
     info_button.click(get_time_and_weather, inputs=None, outputs=info_output, api_name=False, queue=False)
 
+    with gr.Row():
+        remember_box = gr.Textbox(label="Remember", placeholder="Jeff prefers warm lights at night")
+        remember_kind = gr.Dropdown(["note", "digest"], value="note", label="Kind")
+        remember_button = gr.Button("Save")
+    remember_output = gr.JSON(label="Saved")
+    remember_button.click(remember, inputs=[remember_box, remember_kind], outputs=remember_output,
+                          api_name=False, queue=False)
+
+    recall_button = gr.Button("Recall memory")
+    recall_output = gr.JSON(label="Memory")
+    recall_button.click(recall_memory, inputs=None, outputs=recall_output, api_name=False, queue=False)
+
     # MCP tool endpoints (what the Reachy conversation app calls).
     gr.api(control_home, api_name="control_home", api_description=CONTROL_DESCRIPTION,
            queue=False, concurrency_limit=None)
     gr.api(get_time_and_weather, api_name="get_time_and_weather", api_description=INFO_DESCRIPTION,
+           queue=False, concurrency_limit=None)
+    gr.api(recall_memory, api_name="recall_memory", api_description=RECALL_DESCRIPTION,
+           queue=False, concurrency_limit=None)
+    gr.api(remember, api_name="remember", api_description=REMEMBER_DESCRIPTION,
            queue=False, concurrency_limit=None)
 
 
